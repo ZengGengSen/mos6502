@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MOS6502_ALGORITHM_ICC_
-#define MOS6502_ALGORITHM_ICC_
+#ifndef MOS6502_ALGORITHM_IPP_
+#define MOS6502_ALGORITHM_IPP_
 
 #include "utils/bit.hpp"
 
@@ -236,4 +236,4 @@ auto MOS6502::subtract(uint8 in) -> uint8 {
 }
 
 
-#endif //MOS6502_ALGORITHM_ICC_
+#endif//MOS6502_ALGORITHM_IPP_

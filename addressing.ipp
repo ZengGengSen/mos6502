@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MOS6502_ADDRESSING_ICC_
-#define MOS6502_ADDRESSING_ICC_
+#ifndef MOS6502_ADDRESSING_IPP_
+#define MOS6502_ADDRESSING_IPP_
 
 namespace sen {
 
@@ -74,4 +74,4 @@ auto MOS6502::indirectYIndexed(bool is_write) -> uint16 {
 
 }
 
-#endif //MOS6502_ADDRESSING_ICC_
+#endif//MOS6502_ADDRESSING_IPP_

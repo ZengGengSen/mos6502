@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MOS6502_INSTRUCTION_ICC_
-#define MOS6502_INSTRUCTION_ICC_
+#ifndef MOS6502_INSTRUCTION_IPP_
+#define MOS6502_INSTRUCTION_IPP_
 
 namespace sen {
 
@@ -298,4 +298,4 @@ auto MOS6502::runInstruction() -> void {
 
 }
 
-#endif //MOS6502_INSTRUCTION_ICC_
+#endif//MOS6502_INSTRUCTION_IPP_

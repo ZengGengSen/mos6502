@@ -1,5 +1,4 @@
 #include "mos6502.hpp"
-#include "bit.hpp"
 
 #define A register_.a
 #define X register_.x
@@ -22,6 +21,14 @@
 #define ADDRESS (this->*addr)
 #define ALGORITHM (this->*alg)
 
+#define PNMI signal_.prev_nmi_pending
+#define NMI signal_.nmi_pending
+#define PIRQ signal_.prev_irq_pending
+#define IRQ signal_.irq_pending
+#define PNMIL line_.prev_nmi_line
+#define NMIL line_.nmi_line
+#define IRQL line_.irq_line
+
 namespace sen {
 auto MOS6502::power() -> void {
   A = 0x00;
@@ -30,32 +37,44 @@ auto MOS6502::power() -> void {
   S = 0xff;
   P = 0x04;
   MDR = 0x00;
+
+  signal_ = {};
+  line_ = {};
 }
 
-auto MOS6502::mdr() const -> uint8_t {
+auto MOS6502::mdr() const -> uint8 {
   return MDR;
 }
 
-auto MOS6502::interrupt(uint16_t vector) -> void {
-  r16 origin_pc{};
+auto MOS6502::interrupt() -> void {
+  uint16 vector = 0xfffe;
   idleRead();
   idleRead();
-  origin_pc.w = PC;
 
-  push(origin_pc.hi);
-  push(origin_pc.lo);
+  push(PCH);
+  push(PCL);
   nmi(vector);
-  push(P | 0x20);   // irq and nmi just set U to 1, brk also set B to 1
+  push(P | 0x20);// irq and nmi just set U to 1, brk also set B to 1
   I = 1;
   PCL = read(vector);
   PCH = read(vector + 1);
 }
-}
+}// namespace sen
 
-#include "addressing.icc"
-#include "algorithm.icc"
-#include "instruction.icc"
-#include "memory.icc"
+#include "addressing.ipp"
+#include "algorithm.ipp"
+#include "instruction.ipp"
+#include "memory.ipp"
+#include "serialization.ipp"
+#include "timing.ipp"
+
+#undef IRQL
+#undef NMIL
+#undef PNMIL
+#undef IRQ
+#undef PIRQ
+#undef NMI
+#undef PNMI
 
 #undef ALGORITHM
 #undef ADDRESS
