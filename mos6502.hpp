@@ -66,8 +66,6 @@ struct MOS6502 : public Object {
   // @file: timing.cpp
   auto tick() -> void;
   auto nmi(uint16 &vector) -> void;
-  auto cancelNmi() -> void;
-  auto delayIrq() -> void;
 
   // @file: serialization.ipp
   auto serialize(serializer &serializer) -> void override;

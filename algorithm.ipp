@@ -30,7 +30,10 @@ template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BRK>() -> void {
   PCL = read(vector);
   PCH = read(vector + 1);
 
-  cancelNmi();
+  // @test-file: nmi_and_brk test
+  // Ensure we don't start an NMI right after running a BRK instruction
+  // (first instruction in IRQ handler must run first)
+  PNMI = false;
 }
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BVC>() -> void { branchOnStatusFlag(V == 0, MDR); }
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BVS>() -> void { branchOnStatusFlag(V == 1, MDR); }
@@ -153,9 +156,10 @@ auto MOS6502::addMemoryWithCarry(uint8 in) -> uint8 {
 }
 auto MOS6502::branchOnStatusFlag(bool take, uint8 in) -> void {
   if (take) {
-    //"a taken non-page-crossing branch ignores IRQ/NMI during its last clock, so that next instruction executes before the IRQ"
-    //Fixes "branch_delays_irq" test
-    delayIrq();
+    // @test-file: branch_delays_irq
+    // "a taken non-page-crossing branch ignores IRQ/NMI during
+    // its last clock, so that next instruction executes before the IRQ"
+    if (IRQ && !PIRQ) IRQ = false;
 
     auto displacement = static_cast<int8_t>(in);
     idlePageCrossed(PC, PC + displacement, false);
