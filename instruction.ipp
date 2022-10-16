@@ -28,7 +28,7 @@ template <> auto MOS6502::instruction<MOS6502::InstructionCode::Jump>(Addressing
 }
 
 auto MOS6502::runInstruction() -> void {
-  uint8_t opCode = opcode();
+  uint8 opCode = opcode();
 
 #define official_op(code, ins, addr, alg) \
   case code: instruction<InstructionCode::ins>(&MOS6502::addressing<AddressingCode::addr>, &MOS6502::algorithm<AlgorithmCode::alg>); break

@@ -3,6 +3,8 @@
 #ifndef MOS6502_ALGORITHM_ICC_
 #define MOS6502_ALGORITHM_ICC_
 
+#include "utils/bit.hpp"
+
 namespace sen {
 
 // official algorithm
@@ -18,7 +20,7 @@ template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BMI>() -> void { bran
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BNE>() -> void { branchOnStatusFlag(Z == 0, MDR); }
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BPL>() -> void { branchOnStatusFlag(N == 0, MDR); }
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::BRK>() -> void {
-  uint16_t vector = 0xfffe;
+  uint16 vector = 0xfffe;
   ++PC;
   push(PCH);
   push(PCL);
@@ -129,8 +131,7 @@ template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::XAA>() -> void { A = 
 
 template<> auto MOS6502::algorithm<MOS6502::AlgorithmCode::KIL>() -> void { --PC; }
 
-static bool BCD = false;
-auto MOS6502::addMemoryWithCarry(uint8_t in) -> uint8_t {
+auto MOS6502::addMemoryWithCarry(uint8 in) -> uint8 {
   int16_t out;
 
   if (!BCD || !D) {
@@ -150,7 +151,7 @@ auto MOS6502::addMemoryWithCarry(uint8_t in) -> uint8_t {
   N = bit<7>(out);
   return out & 0xff;
 }
-auto MOS6502::branchOnStatusFlag(bool take, uint8_t in) -> void {
+auto MOS6502::branchOnStatusFlag(bool take, uint8 in) -> void {
   if (take) {
     //"a taken non-page-crossing branch ignores IRQ/NMI during its last clock, so that next instruction executes before the IRQ"
     //Fixes "branch_delays_irq" test
@@ -162,49 +163,49 @@ auto MOS6502::branchOnStatusFlag(bool take, uint8_t in) -> void {
     PC = PC + displacement;
   }
 }
-auto MOS6502::bitMemory(uint8_t in) -> void {
-  uint8_t out = A & in;
+auto MOS6502::bitMemory(uint8 in) -> void {
+  uint8 out = A & in;
   Z = out == 0;
   V = bit<6>(in);
   N = bit<7>(in);
 }
-auto MOS6502::compare(uint8_t reg, uint8_t in) -> uint8_t {
+auto MOS6502::compare(uint8 reg, uint8 in) -> uint8 {
   int out = reg - in;
   C = !bit<8>(out);
-  Z = uint8_t(out) == 0;
+  Z = uint8(out) == 0;
   N = bit<7>(out);
   return out;
 }
-auto MOS6502::loadMemory(uint8_t in) -> uint8_t {
+auto MOS6502::loadMemory(uint8 in) -> uint8 {
   Z = in == 0;
   N = bit<7>(in);
   return in;
 }
-auto MOS6502::shiftLeft(uint8_t in) -> uint8_t {
-  uint8_t out;
+auto MOS6502::shiftLeft(uint8 in) -> uint8 {
+  uint8 out;
   C = bit<7>(in);
   out = in << 1;
   Z = out == 0;
   N = bit<7>(out);
   return out;
 }
-auto MOS6502::shiftRight(uint8_t in) -> uint8_t {
-  uint8_t out;
+auto MOS6502::shiftRight(uint8 in) -> uint8 {
+  uint8 out;
   C = bit<0>(in);
   out = in >> 1;
   Z = out == 0;
   N = 0;
   return out;
 }
-auto MOS6502::rotateLeft(uint8_t in) -> uint8_t {
-  uint8_t c = C;
+auto MOS6502::rotateLeft(uint8 in) -> uint8 {
+  uint8 c = C;
   C = bit<7>(in);
   in = in << 1 | c;
   Z = in == 0;
   N = bit<7>(in);
   return in;
 }
-auto MOS6502::rotateRight(uint8_t in) -> uint8_t {
+auto MOS6502::rotateRight(uint8 in) -> uint8 {
   bool c = C;
   C = bit<0>(in);
   in = c << 7 | in >> 1;
@@ -212,7 +213,7 @@ auto MOS6502::rotateRight(uint8_t in) -> uint8_t {
   N = bit<7>(in);
   return in;
 }
-auto MOS6502::subtract(uint8_t in) -> uint8_t {
+auto MOS6502::subtract(uint8 in) -> uint8 {
   in = ~in;
   int16_t out;
   if (!BCD || !D) {
@@ -227,7 +228,7 @@ auto MOS6502::subtract(uint8_t in) -> uint8_t {
     if (out <= 0xff) out -= 0x60;
   }
   C = bit<8>(out);
-  Z = uint8_t(out) == 0;
+  Z = uint8(out) == 0;
   N = bit<7>(out);
   return out & 0xff;
 }
